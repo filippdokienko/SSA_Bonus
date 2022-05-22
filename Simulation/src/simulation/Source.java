@@ -78,6 +78,7 @@ public class Source implements CProcess
 		Customer p = new Customer();
 		p.stamp(tme,"Creation",name);
 		// pick queue to send customer to
+		// TODO: START (How customers pick queue)
 		if(queue == null){
 			Queue bestQueue = null;
 			for(CustomerAcceptor ca : queues){
@@ -133,6 +134,7 @@ public class Source implements CProcess
 			queue.giveCustomer(p);
 			((Queue) queue).addToLog(tme);
 		}
+		// TODO: END
 		// generate duration
 		if(meanArrTime>0)
 		{

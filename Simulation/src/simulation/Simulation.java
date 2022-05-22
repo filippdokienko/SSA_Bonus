@@ -15,7 +15,7 @@ import java.util.List;
 public class Simulation {
 
 	
-    static double openTime = 2*60; // in minutes, 10 hours
+    static double openTime = 2*60; // in minutes, 10 hours TODO: Start how long store is open in simulation
 
         /**
      * @param args the command line arguments
@@ -35,8 +35,6 @@ public class Simulation {
         System.out.println("Average Delay Time: " + results[2]);
         System.out.println("Average Delay Time (regular): " + results[3]);
         System.out.println("Average Delay Time (service desk): " + results[4]);
-
-
 
     }
 
@@ -98,8 +96,25 @@ public class Simulation {
         CEventList l = new CEventList();
 
 
+        // TODO: START (initialize, 6 cash registers (machines) in total. each cash register has its own regular queue. combined cash register has an additional service queue)
+        // TODO:        Cash Registers have normally distributed service times (different for regular/service desk customers) ; provided in manual
+        // TODO:        2 sources: regular customers and service desk customers (poisson process)
+        // TODO:        customers in source decide which queue to go to
+        // TODO:        In the beginning only two regular and the combined cash register are open
+
+        // TODO:        Returns simulation statistics: Mean Delay overall, etc.
+
         int number_of_cash_registers_regular = 5;
         int number_of_cash_registers_combined = 1;
+
+        double mean_serivce_time_regular = 2.6;
+        double sd_service_time_regular = 1.1;
+        double mean_serivce_time_service = 4.1;
+        double sd_service_time_service = 1.1;
+
+        double service_desk_customers_interarrival_mean = 5.0; // on average 5 minutes between two arrivals
+        double regular_customers_rate = 1; // 1 customer per minute
+        double regular_customers_interarrival_mean = 1/regular_customers_rate;
 
         // A queue for service desk customers
         Queue queue_service = new Queue();
@@ -120,23 +135,13 @@ public class Simulation {
 
 
         // Service desk customers
-        double service_desk_customers_interarrival_mean = 5.0; // on average 5 minutes between two arrivals
         Source s_service = new Source(queue_service,l,"Service desk customers",service_desk_customers_interarrival_mean);
 
         // Regular customers
-        double regular_customers_rate = 1; // 1 customer per minute
-        double regular_customers_interarrival_mean = 1/regular_customers_rate;
         Source s_regular = new Source(regularQueues, l, "Regular customers",regular_customers_interarrival_mean);
 
         // Sinks
         Sink sink = new Sink("Sink");
-
-
-
-        double mean_serivce_time_regular = 2.6;
-        double sd_service_time_regular = 1.1;
-        double mean_serivce_time_service = 4.1;
-        double sd_service_time_service = 1.1;
 
         // Cash registers
         CashRegister[] cash_registers = new CashRegister[number_of_cash_registers_regular + number_of_cash_registers_combined];
@@ -150,7 +155,7 @@ public class Simulation {
 
         // start the eventlist
         l.start(openTime);
-
+        // TODO: END
 
 
         // Compute statistics

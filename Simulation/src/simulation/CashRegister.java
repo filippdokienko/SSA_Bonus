@@ -201,6 +201,7 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		// generate duration
 		if(meanProcTime>0)
 		{
+			// decide which distribution to choose service time from (regular or service desk customer)
 			double duration = 0;
 			if(product.getStations().get(0).equals("Regular customers")){
 				duration = drawRandomGaussian(meanProcTime, sdProcTime);
