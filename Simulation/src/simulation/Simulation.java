@@ -24,7 +24,7 @@ public class Simulation {
 
         // ignore
         if(false){
-            sample(1,100);
+            sample(100,100);
             System.exit(187);
         }
 
@@ -35,7 +35,6 @@ public class Simulation {
         System.out.println("Average Delay Time: " + results[2]);
         System.out.println("Average Delay Time (regular): " + results[3]);
         System.out.println("Average Delay Time (service desk): " + results[4]);
-        System.out.println("Average Queue running time: " + Arrays.toString((double[]) results[5]));
 
 
 
