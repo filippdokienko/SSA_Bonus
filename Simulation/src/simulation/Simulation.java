@@ -23,9 +23,8 @@ public class Simulation {
     public static void main(String[] args) throws IOException {
 
         // ignore
-        if(true){
-            simulate();
-            //sample(100,100);
+        if(false){
+            sample(1,100);
             System.exit(187);
         }
 
@@ -49,6 +48,16 @@ public class Simulation {
         double total_AVG_delay_regular = 0;
         double total_AVG_delay_service = 0;
 
+        double total_AVG_queue_length = 0;
+
+        double avg_open_time_q1 = 0;
+        double avg_open_time_q2 = 0;
+        double avg_open_time_q3 = 0;
+        double avg_open_time_q4 = 0;
+        double avg_open_time_q5 = 0;
+        double avg_open_time_q6 = 0;
+
+
         for(int i = 0; i < N; i++){
             Object[] results = simulate();
             total_AVG_arrivals += (int) results[0];
@@ -56,14 +65,31 @@ public class Simulation {
             total_AVG_delay += (double) results[2];
             total_AVG_delay_regular += (double) results[3];
             total_AVG_delay_service += (double) results[4];
+            total_AVG_queue_length += (double) results[5];
+            double[] open_time_q = (double[]) results[6];
+            avg_open_time_q1 += open_time_q[0];
+            avg_open_time_q2 += open_time_q[1];
+            avg_open_time_q3 += open_time_q[2];
+            avg_open_time_q4 += open_time_q[3];
+            avg_open_time_q5 += open_time_q[4];
+            avg_open_time_q6 += open_time_q[5];
         }
 
-        double[] results = new double[5];
+        double[] results = new double[12];
         results[0] = total_AVG_arrivals/N;
         results[1] = total_AVG_served/N;
         results[2] = total_AVG_delay/N;
         results[3] = total_AVG_delay_regular/N;
         results[4] = total_AVG_delay_service/N;
+        results[5] = total_AVG_queue_length/N;
+
+        results[6] =  avg_open_time_q1/N;
+        results[7] =  avg_open_time_q2/N;
+        results[8] =  avg_open_time_q3/N;
+        results[9] =  avg_open_time_q4/N;
+        results[10] =  avg_open_time_q5/N;
+        results[11] =  avg_open_time_q6/N;
+
 
         return results;
     }
@@ -169,18 +195,25 @@ public class Simulation {
         total_avg_delay_regular = total_avg_delay_regular/cr_avg_delay_regular_active;
         total_avg_delay_service = total_avg_delay_service/cr_avg_delay_service_active;
 
+
         double[] queueOpenTime = new double[regularQueues.length];
+        double[] queueLength = new double[regularQueues.length];
+        double total_avg_queue_length = 0;
+
         for (int i = 0; i < regularQueues.length; i++) {
             if(regularQueues[i].isOpen()) {
                 regularQueues[i].close(openTime);
             }
-            System.out.println(regularQueues[i].getAverageQueueLength(openTime));
+            queueLength[i] = regularQueues[i].getAverageQueueLength(openTime);
+            total_avg_queue_length += queueLength[i];
             queueOpenTime[i] = regularQueues[i].runningTime/openTime; // in percent
         }
 
-        System.out.println(Arrays.toString(queueOpenTime));
-        System.out.println("served:  " + totalCustomersServed + " of " + totalCustomersArrived + " customers");
-        return new Object[] {totalCustomersArrived, totalCustomersServed, total_avg_delay, total_avg_delay_regular, total_avg_delay_service, queueOpenTime};
+        total_avg_queue_length = total_avg_queue_length/regularQueues.length;
+
+
+
+        return new Object[] {totalCustomersArrived, totalCustomersServed, total_avg_delay, total_avg_delay_regular, total_avg_delay_service, total_avg_queue_length, queueOpenTime};
     }
 
     private static void sample(int numberOfSamples, int numberOfRunsForAverage) throws IOException {
@@ -190,11 +223,9 @@ public class Simulation {
             System.out.println(i+"/"+numberOfSamples);
             double[] results = simulateAverage(numberOfRunsForAverage);
             List<Double> row_list = new ArrayList<>();
-            row_list.add(results[0]);
-            row_list.add(results[1]);
-            row_list.add(results[2]);
-            row_list.add(results[3]);
-            row_list.add(results[4]);
+            for(double result : results){
+                row_list.add(result);
+            }
             rows.add(row_list);
         }
 
@@ -208,6 +239,20 @@ public class Simulation {
         csvWriter.append("AVG Delay Regular");
         csvWriter.append(",");
         csvWriter.append("AVG Delay Service Desk");
+        csvWriter.append(",");
+        csvWriter.append("AVG Queue Length");
+        csvWriter.append(",");
+        csvWriter.append("Queue Open Time 1");
+        csvWriter.append(",");
+        csvWriter.append("Queue Open Time 2");
+        csvWriter.append(",");
+        csvWriter.append("Queue Open Time 3");
+        csvWriter.append(",");
+        csvWriter.append("Queue Open Time 4");
+        csvWriter.append(",");
+        csvWriter.append("Queue Open Time 5");
+        csvWriter.append(",");
+        csvWriter.append("Queue Open Time 6");
         csvWriter.append("\n");
 
         for (List<Double> rowData : rows) {
