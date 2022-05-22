@@ -24,7 +24,7 @@ public class Simulation {
 
         // ignore
         if(true){
-            sample(2,100);
+            sample(100,100);
             System.exit(187);
         }
 
