@@ -129,7 +129,9 @@ public class Queue implements CustomerAcceptor
 			int size = queueLength.get(i);
 			sum += (time_next-delta_t-time)*size;
 		}
-		sum += queueLength.get(queueLength.size() - 1);
+		if(queueLength.size() > 0) {
+			sum += queueLength.get(queueLength.size() - 1);
+		}
 		return sum/(openTime);
 	}
 

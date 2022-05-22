@@ -23,7 +23,7 @@ public class Simulation {
     public static void main(String[] args) throws IOException {
 
         // ignore
-        if(false){
+        if(true){
             sample(100,100);
             System.exit(187);
         }
