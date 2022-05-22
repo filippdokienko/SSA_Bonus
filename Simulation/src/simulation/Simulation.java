@@ -15,7 +15,7 @@ import java.util.List;
 public class Simulation {
 
 	
-    static double openTime = 10*60; // in minutes, 10 hours
+    static double openTime = 2*60; // in minutes, 10 hours
 
         /**
      * @param args the command line arguments
@@ -24,7 +24,7 @@ public class Simulation {
 
         // ignore
         if(true){
-            sample(100,100);
+            sample(300,100);
             System.exit(187);
         }
 
@@ -228,7 +228,7 @@ public class Simulation {
             rows.add(row_list);
         }
 
-        FileWriter csvWriter = new FileWriter("data.csv");
+        FileWriter csvWriter = new FileWriter("data4.csv");
         csvWriter.append("AVG Arrivals");
         csvWriter.append(",");
         csvWriter.append("AVG Served");
