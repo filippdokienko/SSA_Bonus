@@ -109,6 +109,7 @@ public class Source implements CProcess
 				}
 			}
 			if(DEBUG) System.out.println("Best queue: " + bestQueue);
+			bestQueue.addToLog(tme);
 			bestQueue.giveCustomer(p);
 
 			// check whether any queue may be closed (at least 3 open queues (2 regular + combined))
@@ -130,6 +131,7 @@ public class Source implements CProcess
 			}
 		} else {
 			queue.giveCustomer(p);
+			((Queue) queue).addToLog(tme);
 		}
 		// generate duration
 		if(meanArrTime>0)

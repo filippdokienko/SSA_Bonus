@@ -35,6 +35,10 @@ public class CashRegister implements CProcess, CustomerAcceptor
 	private double meanProcTime;
 	/** SD service time */
 	private double sdProcTime;
+	/** Mean processing time */
+	private double service_meanProcTime;
+	/** SD service time */
+	private double service_sdProcTime;
 	/** Processing times (in case pre-specified) */
 	private double[] processingTimes;
 	/** Processing time iterator */
@@ -72,6 +76,7 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		meanProcTime=mean;
 		sdProcTime=sd;
 		queue.askProduct(this);
+		queue.addToLog(eventlist.getTime());
 	}
 
 	/**
@@ -84,8 +89,10 @@ public class CashRegister implements CProcess, CustomerAcceptor
 	 *	@param n	The name of the machine
 	 *	@param mean	Mean of service time
 	 *	@param sd	Standard deviation of service time
+	 *  @param mean_service	Mean of service time for service desk customers
+	 * 	@param sd_service	Standard deviation of service time for service desk customers
 	 */
-	public CashRegister(Queue q, Queue sq, CustomerAcceptor s, CEventList e, String n, double mean, double sd)
+	public CashRegister(Queue q, Queue sq, CustomerAcceptor s, CEventList e, String n, double mean, double sd, double mean_service, double sd_service)
 	{
 		status='i';
 		queue=q;
@@ -96,7 +103,10 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		name=n;
 		meanProcTime=mean;
 		sdProcTime=sd;
-		queue.askProduct(this);
+		service_meanProcTime=mean_service;
+		service_sdProcTime=sd_service;
+		serviceDeskQueue.askProduct(this);
+		queue.addToLog(eventlist.getTime());
 	}
 
 
@@ -138,6 +148,7 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		else {
 			queue.askProduct(this);
 		}
+		queue.addToLog(eventlist.getTime());
 	}
 	
 	/**
@@ -152,6 +163,7 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		if(status=='i')
 		{
 			if(DEBUG) System.out.println(name + ": accepting customer " + p + " [|Q|=" + queue.getSize() + "]");
+			queue.addToLog(eventlist.getTime());
 
 			// accept the product
 			product=p;
@@ -189,7 +201,13 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		// generate duration
 		if(meanProcTime>0)
 		{
-			double duration = drawRandomGaussian(meanProcTime, sdProcTime);
+			double duration = 0;
+			if(product.getStations().get(0).equals("Regular customers")){
+				duration = drawRandomGaussian(meanProcTime, sdProcTime);
+			}
+			else {
+				duration = drawRandomGaussian(service_meanProcTime, service_sdProcTime);
+			}
 			// Create a new event in the eventlist
 			double tme = eventlist.getTime();
 			eventlist.add(this,0,tme+duration); //target,type,time

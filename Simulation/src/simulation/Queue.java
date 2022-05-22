@@ -1,6 +1,7 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *	Queue that stores products until they can be handled on a machine machine
@@ -27,7 +28,8 @@ public class Queue implements CustomerAcceptor
 	public double runningTime = 0;
 	public double openSince = 0;
 
-	public double averageLength = 0;
+	private List<Integer> queueLength = new ArrayList<>();
+	private List<Double> timeQueue = new ArrayList<>();
 
 	/**
 	*	Initializes the queue and introduces a dummy machine
@@ -111,6 +113,24 @@ public class Queue implements CustomerAcceptor
 			return serviceQueue.getSize() + row.size();
 		}
 		return row.size();
+	}
+
+	public void addToLog(double time){
+		queueLength.add(getSize());
+		timeQueue.add(time);
+	}
+
+	public double getAverageQueueLength(double openTime){
+		double sum = 0;
+		double delta_t = 0.01;
+		for(int i = 0; i < queueLength.size()-1; i++){
+			double time = timeQueue.get(i);
+			double time_next = timeQueue.get(i+1);
+			int size = queueLength.get(i);
+			sum += (time_next-delta_t-time)*size;
+		}
+		sum += queueLength.get(queueLength.size() - 1);
+		return sum/(openTime);
 	}
 
 	@Override
