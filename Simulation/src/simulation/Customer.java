@@ -76,4 +76,9 @@ class Customer
 		tmp = stations.toArray(tmp);
 		return tmp;
 	}
+
+	@Override
+	public String toString(){
+		return "Customer " + ID + ": " + times + " " + events + " " + stations;
+	}
 }

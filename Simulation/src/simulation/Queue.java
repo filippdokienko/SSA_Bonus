@@ -9,6 +9,9 @@ import java.util.ArrayList;
  */
 public class Queue implements CustomerAcceptor
 {
+
+	private final boolean DEBUG = true;
+
 	/** List in which the products are kept */
 	private ArrayList<Customer> row;
 	/** Requests from machine that will be handling the products */
@@ -20,6 +23,12 @@ public class Queue implements CustomerAcceptor
 
 	private static int prevId = 0;
 	public final int ID = prevId++;
+
+	public double runningTime = 0;
+	public double openSince = 0;
+
+	public double averageLength = 0;
+
 	/**
 	*	Initializes the queue and introduces a dummy machine
 	*	the machine has to be specified later
@@ -79,14 +88,18 @@ public class Queue implements CustomerAcceptor
 		return true;
 	}
 
-	public void open(){
+	public void open(double time){
+		if(open) return;
 		open = true;
-		System.out.println("Opening Queue " + ID);
+		openSince = time;
+		if(DEBUG) System.out.println("Opening Queue " + ID);
 	}
 
-	public void close(){
+	public void close(double time){
+		if(!open) return;
 		open = false;
-		System.out.println("Closing Queue " + ID);
+		runningTime += time - openSince;
+		if(DEBUG) System.out.println("Closing Queue " + ID);
 	}
 
 	public boolean isOpen(){

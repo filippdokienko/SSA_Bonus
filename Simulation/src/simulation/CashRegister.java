@@ -9,6 +9,9 @@ import java.util.Random;
  */
 public class CashRegister implements CProcess, CustomerAcceptor
 {
+	
+	private final boolean DEBUG = true;
+	
 	/** Whether this is the store-front */
 	public boolean isStoreFront = false;
 	/** Product that is being handled  */
@@ -37,7 +40,17 @@ public class CashRegister implements CProcess, CustomerAcceptor
 	/** Processing time iterator */
 	private int procCnt;
 
-	public int countAcceptedCustomers = 0;
+	public int acceptedCustomers = 0;
+	public int departedCustomers = 0;
+	public double totalDelay = 0;
+
+	public int acceptedRegularCustomers = 0;
+	public int departedRegularCustomers = 0;
+	public double totalDelayRegular = 0;
+
+	public int acceptedServiceCustomers = 0;
+	public int departedServiceCustomers = 0;
+	public double totalDelayService = 0;
 
 	/**
 	 *	Constructor
@@ -95,7 +108,16 @@ public class CashRegister implements CProcess, CustomerAcceptor
 	public void execute(int type, double tme)
 	{
 		// show arrival
-		System.out.println("Departure at time = " + tme);
+		if(DEBUG) System.out.println("Departure at time = " + tme + "(" + product + ")");
+
+		departedCustomers++;
+
+		if(product.getStations().get(0).equals("Regular customers")){
+			departedRegularCustomers++;
+		} else {
+			departedServiceCustomers++;
+		}
+
 		// Remove product from system
 		product.stamp(tme,"Production complete",name);
 		sink.giveCustomer(product);
@@ -129,12 +151,25 @@ public class CashRegister implements CProcess, CustomerAcceptor
 		// Only accept something if the machine is idle
 		if(status=='i')
 		{
-			System.out.println(name + ": accepting customer " + p.ID + " [|Q|=" + queue.getSize() + "]");
-			countAcceptedCustomers++;
+			if(DEBUG) System.out.println(name + ": accepting customer " + p + " [|Q|=" + queue.getSize() + "]");
+
 			// accept the product
 			product=p;
 			// mark starting time
 			product.stamp(eventlist.getTime(),"Production started",name);
+
+			double delayOfCustomer = p.getTimes().get(1) - p.getTimes().get(0); // Service Started - Arrival
+			totalDelay += delayOfCustomer;
+
+			acceptedCustomers++;
+			if(p.getStations().get(0).equals("Regular customers")){
+				acceptedRegularCustomers++;
+				totalDelayRegular += delayOfCustomer;
+			} else {
+				acceptedServiceCustomers++;
+				totalDelayService += delayOfCustomer;
+			}
+
 			// start production
 			startProduction();
 			// Flag that the product has arrived
@@ -180,5 +215,15 @@ public class CashRegister implements CProcess, CustomerAcceptor
 
 	public static double drawRandomGaussian(double mean, double stddev){
 		return new Random().nextGaussian()*stddev+mean;
+	}
+
+
+	public double[] getPerformance(){
+		double avg_delay_overall = totalDelay/acceptedCustomers;
+		double avg_delay_regular = totalDelayRegular/acceptedRegularCustomers;
+		double avg_delay_service = totalDelayService/acceptedServiceCustomers;
+
+		return new double[] {avg_delay_overall, avg_delay_regular, avg_delay_service, acceptedCustomers, acceptedRegularCustomers, acceptedServiceCustomers, departedCustomers, departedRegularCustomers, departedServiceCustomers};
+
 	}
 }

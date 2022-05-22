@@ -12,6 +12,9 @@ import java.util.List;
  */
 public class Source implements CProcess
 {
+
+	private final boolean DEBUG = true;
+
 	/** Eventlist that will be requested to construct events */
 	private CEventList list;
 	/** Queue that buffers products for the machine */
@@ -69,7 +72,7 @@ public class Source implements CProcess
 	public void execute(int type, double tme)
 	{
 		// show arrival
-		System.out.println("Arrival at time = " + tme);
+		if(DEBUG) System.out.println("Arrival at time = " + tme);
 		numberOfArrivals++;
 		// give arrived product to queue
 		Customer p = new Customer();
@@ -90,7 +93,7 @@ public class Source implements CProcess
 				for (CustomerAcceptor ca : queues) {
 					Queue q = (Queue) ca;
 					if (!q.isOpen()) {
-						q.open();
+						q.open(tme);
 						bestQueue = q;
 						break;
 					}
@@ -105,7 +108,7 @@ public class Source implements CProcess
 					if (q.getSize() < bestSize) bestQueue = q;
 				}
 			}
-			System.out.println("Best queue: " + bestQueue);
+			if(DEBUG) System.out.println("Best queue: " + bestQueue);
 			bestQueue.giveCustomer(p);
 
 			// check whether any queue may be closed (at least 3 open queues (2 regular + combined))
@@ -121,7 +124,7 @@ public class Source implements CProcess
 			}
 			while(openQueues > 2 && emptyOpenQueues.size() > 0){
 				Queue q = emptyOpenQueues.get(0);
-				q.close();
+				q.close(tme);
 				emptyOpenQueues.remove(0);
 				openQueues--;
 			}
