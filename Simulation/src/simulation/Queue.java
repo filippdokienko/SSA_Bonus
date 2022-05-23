@@ -120,19 +120,29 @@ public class Queue implements CustomerAcceptor
 		timeQueue.add(time);
 	}
 
-	public double getAverageQueueLength(double openTime){
+	/**
+	 * Returns the average queue length
+	 * @param openTime Total time of the simulation
+	 * @param onlyWhenNonEmpty Ignores instances where the queue is empty
+	 * @return
+	 */
+	public double getAverageQueueLength(double openTime, boolean onlyWhenNonEmpty){
 		double sum = 0;
-		double delta_t = 0.01;
+		double totalTime = 0;
 		for(int i = 0; i < queueLength.size()-1; i++){
 			double time = timeQueue.get(i);
 			double time_next = timeQueue.get(i+1);
 			int size = queueLength.get(i);
-			sum += (time_next-delta_t-time)*size;
+			if(onlyWhenNonEmpty && size == 0) continue; // only when queue is not empty
+			totalTime += time_next - time;
+			sum += (time_next-time)*size;
 		}
-		if(queueLength.size() > 0) {
+		if(queueLength.size() > 0 && queueLength.get(queueLength.size()-1) > 0){
 			sum += queueLength.get(queueLength.size() - 1)*(openTime-timeQueue.get(queueLength.size()-1));
+			totalTime+= openTime - timeQueue.get(queueLength.size()-1);
 		}
-		return sum/(openTime);
+		if(totalTime == 0) return 0;
+		return sum/(totalTime);
 	}
 
 	@Override
